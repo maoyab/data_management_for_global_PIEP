@@ -143,11 +143,10 @@ if __name__ == '__main__':
     picklename = os.path.join(results_path, 'intermediary_files', 'combined_results_smap_global_annual_f.pickle')
     with open(picklename, 'wb') as f:
         pickle.dump(df0, f)
-    
 
 
 # merge attributes, calculate MvG thresholds make .nc...........................................................
-    
+
     picklename = os.path.join(results_path, 'intermediary_files', 'combined_results_smap_global_annual_f.pickle')
     print picklename
     with open(picklename, 'rb') as f:
@@ -194,29 +193,24 @@ if __name__ == '__main__':
     df_r = df_r.groupby(['y', 'x']).mean()
     ds = df_r.to_xarray()
 
-    mask = ds['num_pl'] < 3
-    piep_var = ['s_star', 's_wilt', 'f_max', 'f_w', 'psi_0', 'psi_1',
-                's_wilt_grd', 's_star_grd', 'f_max_grd', 'f_w_grd', 'efficiency',
-                'NSE_pdf', 'stress_index', 'swnwu', 'norm_wu']
-    for v in piep_var:
-        ds[v] = xr.where(mask, np.nan, ds[v])
-
     nc_filename = os.path.join(results_path, 'intermediary_files', 'sswbinv_results_smap_global_annual_f.pickle')
     print ds
     ds.to_netcdf(nc_filename)
-    
+
 
 # save selected attributes to nc data for publication...............................................................................
 
     f = os.path.join(results_path, 'intermediary_files', 'sswbinv_results_smap_global_annual_f.pickle')
     ds = xr.open_dataset(f)
 
-    ds['pct Bare'] = ds['PFT0']
-    ds['pct C4'] = ds['PFT14']
-    ds['pct C3'] = ds['PFT12'] + ds['PFT13']
-    ds['pct Tree'] = ds['PFT1'] + ds['PFT2'] + ds['PFT3'] + ds['PFT4'] + ds['PFT5'] + ds['PFT6'] + ds['PFT7'] + ds['PFT8']
-    ds['pct Shrub'] = ds['PFT9'] + ds['PFT10'] + ds['PFT11']
-    ds['pct Crop'] = 1 - ds['pct C4'] - ds['pct C3'] - ds['pct Shrub'] - ds['pct Tree'] - ds['pct Bare']
+    mask = ds['num_pl'] < 3
+    piep_var = ['s_star', 's_wilt', 'f_max', 'f_w', 'psi_0', 'psi_1',
+                's_wilt_grd', 's_star_grd', 'f_max_grd', 'f_w_grd',
+                's_wilt_std', 's_star_std', 'f_max_std', 'f_w_std', 'efficiency',
+                'NSE_pdf', 'stress_index', 'swnwu', 'norm_wu']
+    for v in piep_var:
+        ds[v] = xr.where(mask, np.nan, ds[v])
+
     ds['alpha_MvG'] = ds['alpha_fit_5cm']
     ds['n_MvG'] = ds['n_fit_5cm']
     ds['Z'] = ds['Zr']
@@ -245,16 +239,20 @@ if __name__ == '__main__':
                     ['rf_alpha', 'mm/day', 'average daily rainfall depth'],
                     ['rf_lambda', 'unitless', 'average daily rainfall frequency'],
                     ['E_p', 'mm/day', 'average daily potential evapotranspiration'],
-                    ['s_star', 'unitless', 'soil saturation at the point of incipient stomatal closure'],
-                    ['s_wilt', 'unitless', 'soil saturation at the wilting point'],
-                    ['f_max', 'unitless', 'ratio of maximum soil water uptake to potential evapotranspiration'],
-                    ['f_w', 'unitless', 'ratio of soil water uptake at the wilting point to potential evapotranspiration'],
+                    ['s_star', 'unitless', 'soil saturation at the point of incipient stomatal closure, mean of posterior estimates'],
+                    ['s_wilt', 'unitless', 'soil saturation at the wilting point, mean of posterior estimates'],
+                    ['f_max', 'unitless', 'ratio of maximum soil water uptake to potential evapotranspiration, mean of posterior estimates'],
+                    ['f_w', 'unitless', 'ratio of soil water uptake at the wilting point to potential evapotranspiration, mean of posterior estimates'],
                     ['psi_0', 'MPa', 'soil water potential at the point of no soil water uptake'],
                     ['psi_1', 'MPa', 'soil water potential at the point of downregulation of soil water uptake'],
                     ['s_wilt_grd', 'unitless', 'Gelman-Rubin diagnostic for s_wilt'],
                     ['s_star_grd', 'unitless', 'Gelman-Rubin diagnostic for s_star'],
                     ['f_max_grd', 'unitless', 'Gelman-Rubin diagnostic for f_max'],
                     ['f_w_grd', 'unitless', 'Gelman-Rubin diagnostic for f_w'],
+                    ['s_wilt_std', 'unitless', 'standard deviation of posterior estimates of s_wilt'],
+                    ['s_star_std', 'unitless', 'standard deviation of posterior estimates of s_star'],
+                    ['f_max_std', 'unitless', 'standard deviation of posterior estimates of f_max'],
+                    ['f_w_std', 'unitless', 'standard deviation of posterior estimates of f_w'],
                     ['efficiency', 'unitless', 'efficiency of Metropolis-Hastings Markov chain Monte Carlo algorithm'],
                     ['NSE_pdf', 'unitless', 'quantile level Nash Sutcliffe efficiency between theoretical and empirical soil saturation probability distribution using inferred critical ecohydrological thresholds'],
                     ['NSE_pdf_rc', 'unitless', 'quantile level Nash Sutcliffe efficiency between theoretical and empirical soil saturation probability distribution using constant reference critical ecohydrological thresholds'],
@@ -264,12 +262,6 @@ if __name__ == '__main__':
                     ['norm_wu_rc', 'unitless', 'soil water use normalized by rainfall estimated using constant reference critical ecohydrological thresholds'],
                     ['swnwu', 'unitless', 'stress weighted normalized water use estimated using inferred critical ecohydrological thresholds'],
                     ['swnwu_rc', 'unitless', 'stress weighted normalized water use estimated using constant reference critical ecohydrological thresholds'], 
-                    ['pct Tree', 'unitless', 'abundance of tree plant functional type'],
-                    ['pct Shrub', 'unitless', 'abundance of shrub plant functional type'],
-                    ['pct C3', 'unitless', 'abundance of C3 grass plant functional type'],
-                    ['pct C4', 'unitless', 'abundance of C4 grass plant functional type'],
-                    ['pct Bare', 'unitless', 'percentage  bare ground'],
-                    ['pct Crop', 'unitless', 'abundance of crop plant functional type'],
                     ['vegcls', 'unitless', 'IGBP land cover class'],
                     ]
 
@@ -280,8 +272,8 @@ if __name__ == '__main__':
                 'author': 'Maoya Bassiouni', 'contact': 'bassioum@oregonstate.edu',
                 'date': '2019',
                 'grid': '36 km Equal-Area Scalable Earth Grid, Version 2.0 (EASE-Grid 2.0) in a global cylindrical projection',
-                'description': 'input parameters and results associated with analysis in "Global Variation in Critical Soil Water Potentials" (Bassiouni et al., in preparation)',
-                'methods': 'for methods and references to original datasets used see "Global Variation in Critical Soil Water Potentials" (Bassiouni et al., in preparation)'}
+                'description': 'input parameters and results associated with analysis in "Global Variation in Thresholds of Soil Water Uptake" (Bassiouni et al., in preparation)',
+                'methods': 'for methods and references to original datasets used see "Global Variation in Thresholds of Soil Water Uptake" (Bassiouni et al., in preparation)'}
     for v, unit, descr in selected_vars:
         ds[v].attrs['unit'] = unit
         ds[v].attrs['description'] = descr
