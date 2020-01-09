@@ -235,8 +235,8 @@ def get_season_et0(ds_attributes, ds_et0):
 
 if __name__ == "__main__":
 
-# resample and save clsm landcover class & soil params nc file.......................................................
-
+# resample and save clsm landcover class & soil params nc file..........................................................
+    '''
     f_clsm = os.path.join(drive, 'Original_Data/n5eil01u.ecs.nsidc.org/SMAP', 'SPL4SMLM.004', 'SMAP_L4_SM_lmc_00000000T000000_Vv4030_001.h5')
     with h5py.File(f_clsm, mode='r') as f:
         clsm_poros = get_clsm_data(f, '/Land-Model-Constants_Data/clsm_poros')
@@ -272,14 +272,17 @@ if __name__ == "__main__":
 
     nc_filename_out = os.path.join(drive, 'Processed_Data/SMAP/attributes', 'clsm_params_EASEGRID_36km.nc')
     ds_attributes.to_netcdf(nc_filename_out)
+    '''
 
+# open create ds_attributes  ...........................................................................................
 
-# add ET0, rainfall AI .......................................................................................................
-
-    print 'adding ET0, rainfall AI'
     nc_attributes = os.path.join(drive, 'Processed_Data/SMAP/attributes', 'clsm_params_EASEGRID_36km.nc')
     ds_attributes = xr.open_dataset(nc_attributes)
 
+
+# add ET0, rainfall, AI, estimation period .............................................................................
+
+    print 'adding ET0, rainfall, AI estimation period'
     f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4', 'smap_daily_L4_all.nc')
     ds_l4 = xr.open_dataset(f)
     ds_l4 = ds_l4.sel(time=date_range('2015-04-01', '2018-03-31', freq='1D'))
@@ -290,7 +293,33 @@ if __name__ == "__main__":
     ds_attributes['rainfall'] = (('y', 'x'), ds_l4['rainfall'].values)
 
 
-# resample Monzka soil water retention parameters and merge ...................................................
+# add ET0, rainfall AI validation period ...............................................................................
+
+    print 'adding ET0, rainfall, AI validation period'
+    f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4', 'smap_daily_L4_all.nc')
+    ds_l4 = xr.open_dataset(f)
+    ds_l4 = ds_l4.sel(time=date_range('2018-04-01', '2019-03-31', freq='1D'))
+    ds_l4 = ds_l4.mean(dim='time')
+    ai = ds_l4['et0'] / ds_l4['rainfall']
+    ds_attributes['ai_v'] = (('y', 'x'), ai)
+    ds_attributes['et0_a_v'] = (('y', 'x'), ds_l4['et0'].values)
+    ds_attributes['rainfall_v'] = (('y', 'x'), ds_l4['rainfall'].values)
+
+
+# add ET0, rainfall AI overall period ..................................................................................
+
+    print 'adding ET0, rainfall, AI overall period'
+    f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4', 'smap_daily_L4_all.nc')
+    ds_l4 = xr.open_dataset(f)
+    ds_l4 = ds_l4.sel(time=date_range('2015-04-01', '2019-03-31', freq='1D'))
+    ds_l4 = ds_l4.mean(dim='time')
+    ai = ds_l4['et0'] / ds_l4['rainfall']
+    ds_attributes['ai_o'] = (('y', 'x'), ai)
+    ds_attributes['et0_a_o'] = (('y', 'x'), ds_l4['et0'].values)
+    ds_attributes['rainfall_o'] = (('y', 'x'), ds_l4['rainfall'].values)
+
+
+# resample Monzka soil water retention parameters and merge ............................................................
 
     print 'adding soil water retention parameters'
     mvg_file = os.path.join(drive, 'Original_Data/Hydraul_Param_SoilGrids_Schaap_0', 'Hydraul_Param_SoilGrids_Schaap_sl2.nc')
@@ -306,12 +335,32 @@ if __name__ == "__main__":
     ds_attributes = merge_att_ds(ds_mvg, ds_attributes)
 
 
-# correct theta_r & theta_s with record min / max calculate s_0.033MPa and s_1.5MPa .......................................................
+# resample isohydricity index and merge ................................................................................
+    print 'adding isohydricity index'
+    isohydricity_file = os.path.join(drive, 'Original_Data/Konnings_isohydricity', 'isohydricityAMSRE_Global.nc')
+    ds_isohydr = xr.open_dataset(isohydricity_file)
+    ds_isohydr = ds_isohydr.set_coords(['latitude', 'longitude'])
+    ds_isohydr = ds_isohydr.drop('questions')
+
+    lats = ds_isohydr['latitude'].values
+    lons = ds_isohydr['longitude'].values
+    lats, lons = np.meshgrid(lats, lons)
+    lats = lats.flatten()
+    lons = lons.flatten()
+    isohydricity = ds_isohydr['isohydricity'].values
+    isohydricity = isohydricity.flatten()
+    cols, rows = lat_lon_to_36kmEASEGRID2_row_cols(lats, lons)
+    df_isohydr = DataFrame(data={'isohydricity_fixed': isohydricity,
+                                'x': cols, 'y': rows})
+    ds_attributes = merge_att_ds(df_isohydr, ds_attributes)
+
+
+# correct theta_r & theta_s with record (estimation period) min / max calculate s_0.033MPa and s_1.5MPa ................
 
     print 'adjusting soil parameters'
     f = os.path.join(drive, 'Processed_Data/SMAP/daily_sm_L3', 'smapL3_daily_sm_all.nc')
     ds_sm = xr.open_dataset(f)
-    sel_period = date_range('2015-04-01', '2018-03-31', freq='1D')
+    sel_period = date_range('2015-04-01', '2018-03-31', freq='1D') #  based on estimation period
     ds_sm = ds_sm.sel(time=sel_period)
 
     ds_attributes['len_s_obs'] = (['y', 'x'], ds_sm.count(dim='time')['soil_moisture'].values)
@@ -340,8 +389,35 @@ if __name__ == "__main__":
     ds_attributes['std_s'] = (['y', 'x'], ds_sm.std(dim='time')['soil_moisture'].values / ds_attributes['n'].values)
 
 
-# resample PFT and merge ...................................................
+# n, s_h,  s_0.033MPa and s_1.5MPa, min / max s overall period .........................................................
 
+    print 'overall period soil parameters'
+    f = os.path.join(drive, 'Processed_Data/SMAP/daily_sm_L3', 'smapL3_daily_sm_all.nc')
+    ds_sm = xr.open_dataset(f)
+    sel_period = date_range('2015-04-01', '2019-03-31', freq='1D') #  based on overall period
+    ds_sm = ds_sm.sel(time=sel_period)
+
+    n = np.nanmax([ds_attributes['mean_theta_s_5cm'].values, ds_sm.max(dim='time')['soil_moisture'].values], axis=0)
+    ds_attributes['n_o'] = (['y', 'x'], n)
+
+    s_h = np.nanmin([ds_attributes['mean_theta_r_5cm'].values / ds_attributes['mean_theta_s_5cm'].values,
+                   ds_sm.min(dim='time')['soil_moisture'].values / ds_attributes['n_o'].values - 0.01], axis=0)
+
+    ds_attributes['s_h_o'] = (['y', 'x'], s_h)
+
+    ds_attributes['s_1.5MPa_o'] = (['y', 'x'], cal_MvG_s(ds_attributes, 15295.7))
+    ds_attributes['s_0.033MPa_o'] = (['y', 'x'], cal_MvG_s(ds_attributes, 336.5))
+    s_fc = ds_attributes['s_0.033MPa_o']
+    ds_attributes['s_fc_o'] = (['y', 'x'], s_fc)
+
+    ds_attributes['max_s_o'] = (['y', 'x'], ds_sm.max(dim='time')['soil_moisture'].values / ds_attributes['n_o'].values)
+    ds_attributes['min_s_o'] = (['y', 'x'], ds_sm.min(dim='time')['soil_moisture'].values / ds_attributes['n_o'].values)
+    ds_attributes['mean_s_o'] = (['y', 'x'], ds_sm.mean(dim='time')['soil_moisture'].values / ds_attributes['n_o'].values)
+    ds_attributes['std_s_o'] = (['y', 'x'], ds_sm.std(dim='time')['soil_moisture'].values / ds_attributes['n_o'].values)
+
+
+# resample PFT and merge ...............................................................................................
+    
     pft_file = os.path.join(drive, 'Original_Data/global_maps_of_plant_traits', 'filtered_preds.csv')
     pft_data = read_csv(pft_file)
 
@@ -383,7 +459,7 @@ if __name__ == "__main__":
     ds_attributes['PFT0'] = xr.where(mask, 1, ds_attributes['PFT0'])
 
 
-# add RF characteristics annual .......................................
+# add RF characteristics annual estimation period ......................................................................
 
     print 'adding RF characteristics annual'
     f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4/', 'smap_daily_L4_all.nc')
@@ -397,7 +473,35 @@ if __name__ == "__main__":
     ds_attributes['rf_lambda_a'] = (['y', 'x'], l)
 
 
-# add seasonal rainfall characteristics .......................................
+# add RF characteristics annual validation period ......................................................................
+
+    print 'adding RF characteristics annual validation year'
+    f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4/', 'smap_daily_L4_all.nc')
+    ds_climate = xr.open_dataset(f)
+    ds_rf = ds_climate.drop(['et0', 'specific_humidity'])
+
+    sel_period = date_range('2018-04-01', '2019-03-31', freq='1D')
+    ds_rf = ds_rf.sel(time=sel_period)
+    a, l = stochastic_rf_char(ds_rf)
+    ds_attributes['rf_alpha_a_v'] = (['y', 'x'], a)
+    ds_attributes['rf_lambda_a_v'] = (['y', 'x'], l)
+
+
+# add RF characteristics annual overal period ..........................................................................
+
+    print 'adding RF characteristics annual validation year'
+    f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4/', 'smap_daily_L4_all.nc')
+    ds_climate = xr.open_dataset(f)
+    ds_rf = ds_climate.drop(['et0', 'specific_humidity'])
+
+    sel_period = date_range('2015-04-01', '2019-03-31', freq='1D')
+    ds_rf = ds_rf.sel(time=sel_period)
+    a, l = stochastic_rf_char(ds_rf)
+    ds_attributes['rf_alpha_a_o'] = (['y', 'x'], a)
+    ds_attributes['rf_lambda_a_o'] = (['y', 'x'], l)
+
+
+# add seasonal rainfall characteristics estimation period ..............................................................
 
     print 'adding RF characteristics seasonal'
     nyrs = 3
@@ -413,7 +517,7 @@ if __name__ == "__main__":
     ds_attributes['dry_season_rf'] = (['y', 'x'], dry_rf)
 
 
-# add seasonal et0 characteristics ..............................................
+# add seasonal et0 characteristics estimation period ...................................................................
 
     print 'adding et0 characteristics seasonal'
     ds_et0 = ds_climate.drop(['rainfall', 'specific_humidity'])
@@ -426,9 +530,9 @@ if __name__ == "__main__":
     ds_attributes['et0_dry'] = (['y', 'x'], et0_dry)
 
 
-# save .........................................................................
+# save .................................................................................................................
 
     print 'saving'
-    nc_filename_out = os.path.join(drive, 'Processed_Data/SMAP/attributes', 'sw_model_parameters_for_it.nc')
+    nc_filename_out = os.path.join(drive, 'Processed_Data/SMAP/attributes', 'sw_model_parameters_for_it_revision.nc')
     ds_attributes.to_netcdf(nc_filename_out)
 
