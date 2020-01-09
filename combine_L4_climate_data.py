@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
 # resample L4 9km:3h to 36km: 1day ............................................................
 
-    days = date_range('2015-03-31', '2018-09-30', freq='1D')
+    days = date_range('2015-03-31', '2019-03-31', freq='1D')
     for day in days:
         print day
         datetime_day = date_range('%d-%02d-%02d 01:30:00' % (day.year, day.month, day.day), \
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         ds.to_netcdf(nc_filename_out)
 
 # combine L4 daily ts by month nc files ............................................................
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         for month in range(1, 13):
             print year, month
             n_days = calendar.monthrange(year, month)[1]
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             ds.to_netcdf(f)
 
 # combine month nc files to year nc files............................................................
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         ds = []
         for month in range(1, 13):
             print year, month
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
 # combine yearly nc files to all nc file ............................................................
     ds = []
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         print year
         f = os.path.join(drive, 'Processed_Data/SMAP/daily_L4', 'smap_daily_L4_%d_y.nc' % (year))
         dsi = xr.open_dataset(f)

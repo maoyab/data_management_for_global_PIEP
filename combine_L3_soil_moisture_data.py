@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
 # makes sm daily nc and filter by quality / surface flags combine am + pm retrievals ...............................
 
-    days = date_range('2015-01-01', '2018-12-31', freq='1D')
+    days = date_range('2015-01-01', '2019-12-31', freq='1D')
     for day in days:
         ds = sm_day_ds(day, x_s_flags_i=[], x_qr_flags_i=[0, ])
         nc_filename_out = os.path.join(drive, 'Processed_Data/SMAP/daily_sm_L3', 'smapL3_daily_sm_%d%02d%02d.nc' % (day.year, day.month, day.day))
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
 # combine sm daily ts by month nc files ............................................................
 
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         for month in range(1, 13):
             print year, month
             n_days = calendar.monthrange(year, month)[1]
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
 # combine month nc files to year nc files............................................................
 
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         ds = []
         for month in range(1, 13):
             print year, month
@@ -132,7 +132,7 @@ if __name__ == "__main__":
 # combine yearly nc files to all nc file ............................................................
 
     ds = []
-    for year in [2015, 2016, 2017, 2018]:
+    for year in [2015, 2016, 2017, 2018, 2019]:
         f = os.path.join(drive, 'Processed_Data/SMAP/daily_sm_L3', 'smapL3_daily_sm_%d_y.nc' % (year))
         dsi = xr.open_dataset(f)
         ds.append(dsi)
