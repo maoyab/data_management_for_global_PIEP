@@ -1,7 +1,7 @@
 # Data Management For Global PIEP
 This repository contains code associated with data and result processing in:
 
-Bassiouni, M., Good S.P., W., Still, C. J., and Higgins, C.: Global Variation in Critical Soil Water Potentials, in preparation.
+Bassiouni, M., Good S.P., W., Still, C. J., and Higgins, C.:  Plant Water Uptake Thresholds Inferred from Satellite Soil Moisture, in preparation.
 
 Code for PIEP is available at https://doi.org/10.5281/zenodo.1257718 or https://github.com/maoyab/PIEP
 
