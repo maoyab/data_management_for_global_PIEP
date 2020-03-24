@@ -9,15 +9,23 @@ Global Dataset of Ecohydrological Parameters resulting from this study is availa
 
 
 Datasets used:
+
 combine_L3_soil_moisture_data.py - Combine SMAP L3 soil moisture data (https://doi.org/10.5067/ZX7YX2Y2LHEB)
+
 combine_L4_climate_data.py - Combine selected variables in SMAP L4 data (https://doi.org/10.5067/KPJNN2GI1DQR)
+
 global soil hydraulic parameters (https://doi.pangaea.de/10.1594/PANGAEA)
+
 IGBP landcover classification (https://doi.org/10.5067/KGLC3UH4TMAQ.)
 
 
 Files:
+
 compile_attributes.py - Compile global attributes for PIEP including
+
 make_SMAP_PIEP_iterable.py - create iterables for PIEP
+
 combine_results_0.py - combine PIEP results
+
 process_results.py - summarize global PIEP results
 
