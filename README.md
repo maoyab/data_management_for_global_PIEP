@@ -1,7 +1,7 @@
 # Data Management For Global PIEP
 This repository contains code associated with data and result processing in:
 
-Bassiouni, M., S.P. Good, C.J. Still, and C.W. Higgins (2020), Plant water uptake thresholds inferred from satellite soil moisture. Geophysical Research Letters, 45. https://doi.org/10.1029/2020GL087077 
+Bassiouni, M., S.P. Good, C.J. Still, and C.W. Higgins (2020), Plant water uptake thresholds inferred from satellite soil moisture. Geophysical Research Letters. https://doi.org/10.1029/2020GL087077 
 
 Code for PIEP is available at https://doi.org/10.5281/zenodo.1257718 or https://github.com/maoyab/PIEP
 
