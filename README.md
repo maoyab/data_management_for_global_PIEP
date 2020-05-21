@@ -1,31 +1,26 @@
 # Data Management For Global PIEP
-This repository contains code associated with data and result processing in:
 
+**This repository contains code associated with data and result processing in:**
 Bassiouni, M., S.P. Good, C.J. Still, and C.W. Higgins (2020), Plant water uptake thresholds inferred from satellite soil moisture. Geophysical Research Letters. https://doi.org/10.1029/2020GL087077 
 
-Code for PIEP is available at https://doi.org/10.5281/zenodo.1257718 or https://github.com/maoyab/PIEP
+Code to estimate ecohydrological parameters that best fit empirical soil saturation probability functions see:
+*Probabilistic Inference of Ecohydrological Parameters (PIEP)*: http://doi.org/10.5281/zenodo.1257718 or https://github.com/maoyab/PIEP
 
-Global Dataset of Ecohydrological Parameters resulting from this study is available at https://doi.org/10.5281/zenodo.3351622
-
-
-Datasets used:
-
-combine_L3_soil_moisture_data.py - Combine SMAP L3 soil moisture data (https://doi.org/10.5067/ZX7YX2Y2LHEB)
-
-combine_L4_climate_data.py - Combine selected variables in SMAP L4 data (https://doi.org/10.5067/KPJNN2GI1DQR)
-
-global soil hydraulic parameters (https://doi.pangaea.de/10.1594/PANGAEA)
-
-IGBP landcover classification (https://doi.org/10.5067/KGLC3UH4TMAQ.)
+Global dataset of pcohydrological parameters resulting from this study is available at https://doi.org/10.5281/zenodo.3351622
 
 
-Files:
+**Datasets used**:
+SMAP L3 soil moisture data: https://doi.org/10.5067/ZX7YX2Y2LHEB
+SMAP L4 Geophysical data: https://doi.org/10.5067/KPJNN2GI1DQR
+Global soil hydraulic parameters: https://doi.pangaea.de/10.1594/PANGAEA
+IGBP landcover classification: https://doi.org/10.5067/KGLC3UH4TMAQ
 
-compile_attributes.py - Compile global attributes for PIEP including
 
-make_SMAP_PIEP_iterable.py - create iterables for PIEP
-
-combine_results_0.py - combine PIEP results
-
-process_results.py - summarize global PIEP results
+**Files**:
+*combine_L3_soil_moisture_data.py* - Combines SMAP L3 soil moisture data 
+*combine_L4_climate_data.py* - Combines selected variables in SMAP L4 data
+*compile_attributes.py* - Compiles global attributes for PIEP
+*make_SMAP_PIEP_iterable.py* - Creates iterables for PIEP
+*combine_results_0.py* - Combines PIEP results
+*process_results.py* - Summarizes global PIEP results and creates .nc dataset of global ecoydrological parameters
 
