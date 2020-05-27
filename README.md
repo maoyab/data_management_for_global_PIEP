@@ -26,14 +26,14 @@ Global dataset of ecohydrological parameters resulting from this study is availa
 
 *combine_results_0.py* - Combines PIEP results
 
-*process_results.py* - Summarizes global PIEP results and creates .nc dataset of global ecoydrological parameters
+*process_results.py* - Summarizes global PIEP results and creates .nc dataset of global ecohydrological parameters
 
 
 **Datasets used**:
 
 SMAP L3 soil moisture data: https://doi.org/10.5067/ZX7YX2Y2LHEB
 
-SMAP L4 Geophysical data: https://doi.org/10.5067/KPJNN2GI1DQR
+SMAP L4 geophysical data: https://doi.org/10.5067/KPJNN2GI1DQR
 
 Global soil hydraulic parameters: https://doi.pangaea.de/10.1594/PANGAEA
 
