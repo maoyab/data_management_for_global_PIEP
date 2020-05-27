@@ -11,7 +11,7 @@ Code to estimate ecohydrological parameters that best fit empirical soil saturat
 *Probabilistic Inference of Ecohydrological Parameters (PIEP)*: http://doi.org/10.5281/zenodo.1257718 or https://github.com/maoyab/PIEP
 
 
-Global dataset of pcohydrological parameters resulting from this study is available at https://doi.org/10.5281/zenodo.3351622
+Global dataset of ecohydrological parameters resulting from this study is available at https://doi.org/10.5281/zenodo.3351622
 
 
 **File descriptions:**
